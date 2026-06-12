@@ -1,0 +1,83 @@
+\documentclass[a4paper, 12pt]{article}
+\pagestyle{empty}
+\usepackage[margin=0.5in]{geometry}
+\usepackage{graphicx}
+\usepackage{amsfonts, amssymb, amsmath, amsthm}
+\usepackage{tikz}
+\usepackage{minted}
+
+\newcommand{\ceil}[1]{\lceil #1 \rceil}
+\newcommand{\floor}[1]{\lfloor #1 \rfloor}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\epf}{\hfill \qed}
+
+\begin{document}
+
+\section*{Chapter 1 Classical Algebra}
+
+\subsection*{Exercise 5}
+
+Let $S = \{p+q\alpha+r\alpha^2 \mid p,q,r\in\Q\}$. We first prove that $S$ is a subring of $\C$. 
+
+Note that $1=1+0\alpha+0\alpha^2\in S$. Let $p+q\alpha+r\alpha^2,p'+q'\alpha+r'\alpha^2 \in S$, where $p,q,r,p',q',r' \in \Q$. Then we have $(p+q\alpha+r\alpha^2)(p'+q'\alpha+r'\alpha^2) = (p+p') + (q+q')\alpha + (r+r')\alpha^2 \in S$, $-(p+q\alpha+r\alpha^2) = (-p) + (-q)\alpha + (-r)\alpha^2 \in S$ and $(p+q\alpha+r\alpha^2)(p'+q'\alpha+r'\alpha^2) = (pp'+2rq') + (pq'+p'q+2rr')\alpha + (pr'+qq'+qr'+rp')\alpha^2 \in S$. By the subring test, $S$ is a ring.
+
+Next, we construct an inverse explicitly to show that $S$ is a subfield. Let $x = p+q\alpha+r\alpha^2 \in S \setminus \{0\}$, where $p,q,r \in \Q$. Then we have $x^2=(p^2+4qr)+(2pq+2r^2)\alpha+(2pr+q^2)\alpha^2$ and $x^3=(p^3+12pqr+2q^3+4r^3)+(3p^2q+6pr^2+6q^2r)\alpha+(3p^2r+3pq^2+6qr^2)\alpha^2$. Let $x^3+k_2x^2+k_1x+k_0=0$. Denote the coefficient of $\alpha^j$ in $x^i$ by $x_{ij}$. Then we have $(x_{30}+x_{31}\alpha+x_{32}\alpha^2)+k_2(x_{20}+x_{21}\alpha+x_{22}\alpha^2)+k_1(p+q\alpha+r\alpha^2)+k_0=0$, that is, $(x_{30}+x_{20}k_2+pk_1+k_0) + (x_{31}+x_{21}k_2+qk_1)\alpha + (x_{32}+x_{22}k_2+rk_1)\alpha^2 = 0$. Since $1,\alpha,\alpha^2$ are linearly independent, comparing coefficients gives us the linear system
+\[ \begin{cases}
+    k_0 + pk_1 + x_{20}k_2 = -x_{30} \\
+    qk_1 + x_{21}k_2 = -x_{31} \\
+    rk_1 + x_{22}k_2 = -x_{32}
+\end{cases}. \]
+We can use the following python code to solve this system.
+
+\begin{minted}[frame=lines, linenos, fontsize=\footnotesize]{python}
+import sympy as sp
+
+k0, k1, k2 = sp.symbols('k0 k1 k2')
+p, q, r = sp.symbols('p q r')
+
+x30 = p**3 + 12 * p * q * r + 2 * (q**3) + 4 * (r**3)
+x31 = 3 * (p**2) * q + 6 * p * (r**2) + 6 * (q**2) * r
+x32 = 3 * (p**2) * r + 3 * p * (q**2) + 6 * q * (r**2)
+x20 = p**2 + 4 * q * r
+x21 = 2 * p * q + 2 * (r**2)
+x22 = 2 * p * r + q**2
+
+M = sp.Matrix([
+    [1, p, x20, - x30],
+    [0, q, x21, - x31],
+    [0, r, x22, - x32]
+])
+
+solution = sp.solve_linear_system(M, k0, k1, k2)
+
+for var in [k0, k1, k2]:
+    print(f"{var} =")
+    sp.pprint(sp.simplify(solution[var]))
+\end{minted}
+
+The solution is $k_0 = -p^3+6pqr-2q^3-4r^3$, $k_1=3p^2-6qr$ and $k_2=-3p$. Since $x^3+k_2x^2+k_1x+k_0 = 0$, we have $x(x^2+k_2x+k_1+k_0x^{-1}) = 0$. Recall that $\C$ is a field and hence a domain, and $x \neq 0$. Therefore, $x^2+k_2x+k_1+k_0x^{-1} = 0$, that is,
+\[x^{-1} = -\frac{1}{k_0}x^2 -\frac{k_2}{k_0}x -\frac{k_1}{k_0}.\]
+Since $x$ and $x^2$ are linear combinations of $1,\alpha,\alpha^2$, $x^{-1}$ is also a linear combination of $1,\alpha,\alpha^2$. \epf
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
