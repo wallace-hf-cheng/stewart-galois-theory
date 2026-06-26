@@ -6,6 +6,12 @@
 \usepackage{minted}
 \usepackage{hyperref}
 
+\setminted{breaklines=true, frame=lines, linenos, fontsize=\footnotesize}
+
+\newcounter{prelem}
+
+\renewcommand{\theprelem}{P\arabic{prelem}}
+
 \newcommand{\ceil}[1]{\lceil #1 \rceil}
 \newcommand{\floor}[1]{\lfloor #1 \rfloor}
 \newcommand{\lt}{\left}
@@ -16,7 +22,10 @@
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\zero}{\mathbf{0}}
+\newcommand{\ideal}[1]{\langle #1 \rangle}
+\newcommand{\imunit}{\mathrm{i}}
 \newcommand{\epf}{\hfill \qed}
+\newcommand{\pf}{\noindent\textit{Proof. }}
 \newcommand{\chap}[1]{
 \section*{#1}
 \addcontentsline{toc}{section}{#1}
@@ -25,11 +34,155 @@
 \subsection*{#1}
 \addcontentsline{toc}{subsection}{#1}
 }
+\newcommand{\prelem}{
+\refstepcounter{prelem}
+\subsection*{Lemma \theprelem}
+\addcontentsline{toc}{subsection}{Lemma \theprelem}
+}
 
 \begin{document}
 
 \tableofcontents
 \newpage
+
+\chap{Preliminary Lemmas}
+
+\prelem \label{prelem:ex4.2d}
+
+The subset $S = \{ p+q\sqrt{2}+r\imunit+s\imunit\sqrt{2} : p,q,r,s \in \Q \}$ of $\C$ is a subfield.
+
+\pf Let $p_1+q_1\sqrt{2}+r_1\imunit+s_1\imunit\sqrt{2},p_2+q_2\sqrt{2}+r_2\imunit+s_2\imunit\sqrt{2} \in S$, where $p_1,q_1,r_1,s_1,p_2,q_2,r_2,s_2 \in \Q$. Note that \[ (p_1+q_1\sqrt{2}+r_1\imunit+s_1\imunit\sqrt{2}) + (p_2+q_2\sqrt{2}+r_2\imunit+s_2\imunit\sqrt{2}) = (p_1+p_2)+(q_1+q_2)\sqrt{2}+(r_1+r_2)\imunit+(s_1+s_2)\imunit\sqrt{2} \in S. \] Next, we can compute the product using the following Python code.
+\begin{minted}{python}
+import sympy as sp
+
+p1, q1, r1, s1, p2, q2, r2, s2 = sp.symbols('p1 q1 r1 s1 p2 q2 r2 s2', real=True)
+sqrt2 = sp.sqrt(2)
+i = sp.I
+
+expression = (p1 + q1*sqrt2 + r1*i + s1*i*sqrt2) * (p2 + q2*sqrt2 + r2*i + s2*i*sqrt2)
+
+print(sp.expand(expression))
+\end{minted}
+We get
+\begin{align*}
+& \, (p_1+q_1\sqrt{2}+r_1\imunit+s_1\imunit\sqrt{2})(p_2+q_2\sqrt{2}+r_2\imunit+s_2\imunit\sqrt{2}) \\
+=& \, p_1p_2+p_1q_2\sqrt{2}+p_1r_2\imunit+p_1s_2\sqrt{2}\imunit+p_2q_1\sqrt{2}+p_2r_1\imunit+p_2s_1\sqrt{2}\imunit+2q_1q_2 \\
+& \, +q_1r_2\sqrt{2}\imunit+2q_1s_2\imunit+q_2r_1\sqrt{2}\imunit+2q_2s_1\imunit-r_1r_2-r_1s_2\sqrt{2}-r_2s_1\sqrt{2}-2s_1s_2 \\
+=& \, (p_1p_2+2q_1q_2-r_1r_2-2s_1s_2) + (p_1q_2+p_2q_1-r_1s_2-r_2s_1)\sqrt{2} \\
+& \, + (p_1r_2+p_2r_1+2q_1s_2+2q_2s_1)\imunit + (p_1s_2+p_2s_1+q_1r_2+q_2r_1)\sqrt{2}\imunit \\
+\in& \, S.
+\end{align*}
+Also, we have \[ -(p_1+q_1\sqrt{2}+r_1\imunit+s_1\imunit\sqrt{2}) = (-p_1) + (-q_1)\sqrt{2} + (-r_1)\imunit + (-s_1)\imunit\sqrt{2} \in S \] and \[ 1 = 1+0\sqrt{2}+0\imunit+0\imunit\sqrt{2} \in S. \] By the subring test, $S$ is a subring of $\C$. We next find an inverse for any non-zero element in $S$ to show that it is a subfield. Let $p+q\sqrt{2}+r\imunit+s\imunit\sqrt{2} \in S$, where $p,q,r,s \in \Q$. We first define \[ \alpha = (p+q\sqrt{2}+r\imunit+s\imunit\sqrt{2})(p+q\sqrt{2}-r\imunit-s\imunit\sqrt{2})(p-q\sqrt{2}+r\imunit-s\imunit\sqrt{2})(p-q\sqrt{2}-r\imunit+s\imunit\sqrt{2}) \] and compute the product using the following Python code.
+\begin{minted}{python}
+import sympy as sp
+
+p, q, r, s = sp.symbols('p q r s', real=True)
+sqrt2 = sp.sqrt(2)
+i = sp.I
+
+alpha = (p + q*sqrt2 + r*i + s*i*sqrt2) * (p + q*sqrt2 - r*i - s*i*sqrt2) * (p - q*sqrt2 + r*i - s*i*sqrt2) * (p - q*sqrt2 - r*i + s*i*sqrt2)
+
+print(sp.expand(alpha))
+\end{minted}
+We get
+\begin{align*}
+    \alpha &= p^4 - 4p^2q^2 + 2p^2r^2 + 4p^2s^2 - 16pqrs + 4q^4 + 4q^2r^2 + 8q^2s^2 + r^4 - 4r^2s^2 + 4s^4 \\
+    &\in S.
+\end{align*}
+Note that $p+q\sqrt{2}+r\imunit+s\imunit\sqrt{2} = 0$ if and only if $p=q=r=s=0$, if and only if $p+q\sqrt{2}-r\imunit-s\imunit\sqrt{2} = p-q\sqrt{2}+r\imunit-s\imunit\sqrt{2} = p-q\sqrt{2}-r\imunit+s\imunit\sqrt{2} = 0$. Hence, $\alpha = 0$ if and only if $p+q\sqrt{2}+r\imunit+s\imunit\sqrt{2} = 0$. Assume $p+q\sqrt{2}+r\imunit+s\imunit\sqrt{2} \neq 0$. Dividing the product by $\alpha$, we have \[ (p+q\sqrt{2}+r\imunit+s\imunit\sqrt{2})\lt(\frac{(p+q\sqrt{2}-r\imunit-s\imunit\sqrt{2})(p-q\sqrt{2}+r\imunit-s\imunit\sqrt{2})(p-q\sqrt{2}-r\imunit+s\imunit\sqrt{2})}{\alpha}\rt) = 1. \] So the inverse of $p+q\sqrt{2}+r\imunit+s\imunit\sqrt{2}$ is $\frac{(p+q\sqrt{2}-r\imunit-s\imunit\sqrt{2})(p-q\sqrt{2}+r\imunit-s\imunit\sqrt{2})(p-q\sqrt{2}-r\imunit+s\imunit\sqrt{2})}{\alpha}$. Since $p+q\sqrt{2}-r\imunit-s\imunit\sqrt{2}, p-q\sqrt{2}+r\imunit-s\imunit\sqrt{2}, p-q\sqrt{2}-r\imunit+s\imunit\sqrt{2}, \alpha \in S$, the inverse is also an element of $S$, proving that $S$ is a subfield. \epf
+
+\prelem \label{prelem:ex4.2e}
+
+The subset $S = \{p+q\sqrt{2}+r\sqrt{3}+s\sqrt{6} : p,q,r,s \in \Q\}$ of $\C$ is a subfield.
+
+\pf Let $p_1+q_1\sqrt{2}+r_1\sqrt{3}+s_1\sqrt{6},p_2+q_2\sqrt{2}+r_2\sqrt{3}+s_2\sqrt{6} \in S$, where $p_1,q_1,r_1,s_1,p_2,q_2,r_2,s_2 \in \Q$. Note that
+\begin{align*}
+    & \, (p_1+q_1\sqrt{2}+r_1\sqrt{3}+s_1\sqrt{6}) + (p_2+q_2\sqrt{2}+r_2\sqrt{3}+s_2\sqrt{6}) \\
+    =& \, (p_1+p_2)+(q_1+q_2)\sqrt{2}+(r_1+r_2)\sqrt{3}+(s_1+s_2)\sqrt{6} \\
+    \in& \, S.
+\end{align*}
+Next, we can compute the product using the following Python code.
+\begin{minted}{python}
+import sympy as sp
+
+p1, q1, r1, s1, p2, q2, r2, s2 = sp.symbols('p1 q1 r1 s1 p2 q2 r2 s2')
+sqrt2 = sp.sqrt(2)
+sqrt3 = sp.sqrt(3)
+sqrt6 = sp.sqrt(6)
+
+product = (p1 + q1*sqrt2 + r1*sqrt3 + s1*sqrt6) * (p2 + q2*sqrt2 + r2*sqrt3 + s2*sqrt6)
+
+print(sp.collect(sp.expand(product), [sqrt2, sqrt3, sqrt6]))
+\end{minted}
+We get
+\begin{align*}
+    & \, (p_1+q_1\sqrt{2}+r_1\sqrt{3}+s_1\sqrt{6})(p_2+q_2\sqrt{2}+r_2\sqrt{3}+s_2\sqrt{6}) \\
+    =& \, (p_1p_2+2q_1q_2+4r_1r_2+6s_1s_2) + (p_1q_2+p_2q_1+3r_1s_2+3r_2s_1)\sqrt{2} \\
+    & \, (p_1r_2+p_2r_1+2q_1s_2+2q_2s_1)\sqrt{3} + (p_1s_2+p_2s_1+q_1r_2+q_2r_1)\sqrt{6} \\
+    \in& \, S.
+\end{align*}
+Also, we have \[ -(p_1+q_1\sqrt{2}+r_1\sqrt{3}+s_1\sqrt{6}) = (-p_1)+(-q_1)\sqrt{2}+(-r_1)\sqrt{3}+(-s_1)\sqrt{6} \in S \] and \[ 1 = 1+0\sqrt{2}+0\sqrt{3}+0\sqrt{6} \in S. \] By the subring test, $S$ is a subring of $\C$. We next find an inverse for any non-zero element in $S$ to show that it is a subfield. Let $p+q\sqrt{2}+r\sqrt{3}+s\sqrt{6} \in S$, where $p,q,r,s \in \Q$. We first define \[ \alpha = (p+q\sqrt{2}+r\sqrt{3}+s\sqrt{6})(p+q\sqrt{2}-r\sqrt{3}-s\sqrt{6})(p-q\sqrt{2}+r\sqrt{3}-s\sqrt{6})(p-q\sqrt{2}-r\sqrt{3}+s\sqrt{6}) \] and compute the product using the following Python code.
+\begin{minted}{python}
+import sympy as sp
+
+p, q, r, s = sp.symbols('p q r s')
+sqrt2 = sp.sqrt(2)
+sqrt3 = sp.sqrt(3)
+sqrt6 = sp.sqrt(6)
+
+product = (p + q*sqrt2 + r*sqrt3 + s*sqrt6) * (p + q*sqrt2 - r*sqrt3 - s*sqrt6) * (p - q*sqrt2 + r*sqrt3 - s*sqrt6) * (p - q*sqrt2 - r*sqrt3 + s*sqrt6)
+
+print(sp.expand(product))
+\end{minted}
+We get
+\begin{align*}
+    \alpha &= p^4-4p^2q^2-6p^2r^2-12p^2s^2+48pqrs+4q^4-12q^2r^2-24q^2s^2+9r^4-36r^2s^2+36s^4 \\
+    &\in S.
+\end{align*}
+By Exercise 4.4, $1$, $\sqrt{2}$, $\sqrt{3}$ and $\sqrt{6}$ are linearly independent over $\Q$. Therefore, $p+q\sqrt{2}+r\sqrt{3}+s\sqrt{6}=0$ if and only if $p=q=r=s=0$, if and only if $p+q\sqrt{2}-r\sqrt{3}-s\sqrt{6} = p-q\sqrt{2}+r\sqrt{3}-s\sqrt{6} = p-q\sqrt{2}-r\sqrt{3}+s\sqrt{6} = 0$. Hence, $\alpha=0$ if and only if $p+q\sqrt{2}+r\sqrt{3}+s\sqrt{6}=0$. Assume $p+q\sqrt{2}+r\sqrt{3}+s\sqrt{6} \neq 0$. Dividing the product by $\alpha$, we have $(p+q\sqrt{2}+r\sqrt{3}+s\sqrt{6})\lt(\frac{(p+q\sqrt{2}-r\sqrt{3}-s\sqrt{6})(p-q\sqrt{2}+r\sqrt{3}-s\sqrt{6})(p-q\sqrt{2}-r\sqrt{3}+s\sqrt{6})}{\alpha}\rt) = 1$. So the inverse of $p+q\sqrt{2}+r\sqrt{3}+s\sqrt{6}$ is $\frac{(p+q\sqrt{2}-r\sqrt{3}-s\sqrt{6})(p-q\sqrt{2}+r\sqrt{3}-s\sqrt{6})(p-q\sqrt{2}-r\sqrt{3}+s\sqrt{6})}{\alpha}$. Since $p+q\sqrt{2}-r\sqrt{3}-s\sqrt{6}, p-q\sqrt{2}+r\sqrt{3}-s\sqrt{6}, p-q\sqrt{2}-r\sqrt{3}+s\sqrt{6}, \alpha \in S$, the inverse is also an element of $S$, proving that $S$ is a subfield. \epf
+
+
+
+
+
+\prelem \label{prelem:ex4.5b}
+
+Let $K$ be a subfield of $\C$. Then
+\begin{align*}
+    K(\alpha) &= \lt\{ \frac{p(\alpha)}{q(\alpha)} : p(\alpha),q(\alpha) \in K[\alpha], q(\alpha) \neq 0 \rt\} \\
+    &= \lt\{ \frac{a_0+\ldots+a_n\alpha^n}{b_0+\ldots+b_m\alpha^m} : a_0,\ldots,a_n,b_0,\ldots,b_m \in K, b_0+\ldots+b_m\alpha^m \neq 0 \rt\}.
+\end{align*}
+
+\pf First, note that the second equality can be obtained by writing $p(\alpha) = a_0+\ldots+a_n\alpha^n$ and $q(\alpha) = b_0+\ldots+b_m\alpha^m$.
+
+To prove the first equality, recall that $K(\alpha)$ is the smallest subfield of $\C$ generated by $K \cup \{\alpha\}$. Since $K \subseteq K(\alpha)$ and $\alpha \in K(\alpha)$, we have $k_0+\ldots+k_n\alpha^n \in K(\alpha)$ for any $k_0,\ldots,k_n \in K$. If $k_0+\ldots+k_n\alpha^n \neq 0$, then $\frac{1}{k_0+\ldots+k_n\alpha^n} \in K(\alpha)$. Therefore, for any $a_0,\ldots,a_n,b_0,\ldots,b_m \in K$ with $b_0+\ldots+b_m\alpha^m \neq 0$, we have \[ \frac{a_0+\ldots+a_n\alpha^n}{b_0+\ldots+b_m\alpha^m} \in K(\alpha). \] So \[ \lt\{ \frac{a_0+\ldots+a_n\alpha^n}{b_0+\ldots+b_m\alpha^m} : a_0,\ldots,a_n,b_0,\ldots,b_m \in K, b_0+\ldots+b_m\alpha^m \neq 0 \rt\} \subseteq K(\alpha). \]
+
+Next, we want to prove that $\lt\{ \frac{a_0+\ldots+a_n\alpha^n}{b_0+\ldots+b_m\alpha^m} : a_0,\ldots,a_n,b_0,\ldots,b_m \in K, b_0+\ldots+b_m\alpha^m \neq 0 \rt\} = \lt\{ \frac{p(\alpha)}{q(\alpha)} : p(\alpha),q(\alpha) \in K[\alpha], q(\alpha) \neq 0 \rt\}$ is a subfield of $\C$. Let \[\frac{p(\alpha)}{q(\alpha)}, \frac{\hat{p}(\alpha)}{\hat{q}(\alpha)} \in \lt\{ \frac{p(\alpha)}{q(\alpha)} : p(\alpha),q(\alpha) \in K[\alpha], q(\alpha) \neq 0 \rt\},\] where $q(\alpha), \hat{q}(\alpha) \neq 0$. Since $K$ is a field and thus a domain, we have $q(\alpha)\hat{q}(\alpha) \neq 0$. Note that
+\begin{align*}
+    \frac{p(\alpha)}{q(\alpha)} + \frac{\hat{p}(\alpha)}{\hat{q}(\alpha)} &= \frac{p(\alpha)\hat{q}(\alpha) + \hat{p}(\alpha)q(\alpha)}{q(\alpha)\hat{q}(\alpha)} \\
+    &\in \lt\{ \frac{p(\alpha)}{q(\alpha)} : p(\alpha),q(\alpha) \in K[\alpha], q(\alpha) \neq 0 \rt\}, \\
+    \frac{p(\alpha)}{q(\alpha)} \cdot \frac{\hat{p}(\alpha)}{\hat{q}(\alpha)} &= \frac{p(\alpha)\hat{p}(\alpha)}{q(\alpha)\hat{q}(\alpha)} \\
+    &\in \lt\{ \frac{p(\alpha)}{q(\alpha)} : p(\alpha),q(\alpha) \in K[\alpha], q(\alpha) \neq 0 \rt\}, \\
+    -\frac{p(\alpha)}{q(\alpha)} &= \frac{-p(\alpha)}{q(\alpha)} \\
+    &\in \lt\{ \frac{p(\alpha)}{q(\alpha)} : p(\alpha),q(\alpha) \in K[\alpha], q(\alpha) \neq 0 \rt\}.
+\end{align*}
+Also, since $K$ is a subfield of $\C$, we have $1 \in K$. So $1 = \frac{1}{1} \in \lt\{ \frac{p(\alpha)}{q(\alpha)} : p(\alpha),q(\alpha) \in K[\alpha], q(\alpha) \neq 0 \rt\}$. By the subring test, $\lt\{ \frac{p(\alpha)}{q(\alpha)} : p(\alpha),q(\alpha) \in K[\alpha], q(\alpha) \neq 0 \rt\}$ is a subring of $\C$.
+
+Now, suppose $\frac{p(\alpha)}{q(\alpha)} \neq 0$. If $p(\alpha) = 0$, then $\frac{p(\alpha)}{q(\alpha)} = \frac{0}{q(\alpha)} = 0$, a contradiction. Hence, $p(\alpha) \neq 0$. So we have $\frac{q(\alpha)}{p(\alpha)} \in \lt\{ \frac{p(\alpha)}{q(\alpha)} : p(\alpha),q(\alpha) \in K[\alpha], q(\alpha) \neq 0 \rt\}$. Note that $\frac{p(\alpha)}{q(\alpha)} \cdot \frac{q(\alpha)}{p(\alpha)} = 1$, so the inverse of $\frac{p(\alpha)}{q(\alpha)}$ is $\frac{q(\alpha)}{p(\alpha)}$. Therefore, $\lt\{ \frac{p(\alpha)}{q(\alpha)} : p(\alpha),q(\alpha) \in K[\alpha], q(\alpha) \neq 0 \rt\}$ is a subfield of $\C$. Since $\lt\{ \frac{p(\alpha)}{q(\alpha)} : p(\alpha),q(\alpha) \in K[\alpha], q(\alpha) \neq 0 \rt\}$ is a field containing $K \cup \{\alpha\}$, we have $K(\alpha) \subseteq \lt\{ \frac{p(\alpha)}{q(\alpha)} : p(\alpha),q(\alpha) \in K[\alpha], q(\alpha) \neq 0 \rt\}$. Hence, \[K(\alpha) = \lt\{ \frac{p(\alpha)}{q(\alpha)} : p(\alpha),q(\alpha) \in K[\alpha], q(\alpha) \neq 0 \rt\},\] proving the first equality. \epf
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \chap{Chapter 1 Classical Algebra}
 
@@ -78,7 +231,7 @@ Next, we construct an inverse explicitly to show that $S$ is a subfield. Let $x 
 \end{cases}. \]
 We can use the following python code to solve this system.
 
-\begin{minted}[frame=lines, linenos, fontsize=\footnotesize]{python}
+\begin{minted}{python}
 import sympy as sp
 
 k0, k1, k2 = sp.symbols('k0 k1 k2')
@@ -151,6 +304,221 @@ Note that
 \end{vmatrix}
 ,\]
 which is the Vandermonde determinant with $z_1=1$, $z_2=2$, $\ldots$, $z_{n+1}=n+1$. By Exercise 2.5, this determinant is non-zero. So the linear system has no non-trivial solutions. Hence, $a_0 = a_1 = a_2 = \ldots = a_n = 0$. Therefore, all the coefficients of $f$ are zero. \epf
+
+\chap{Chapter 3 Factorisation of Polynomials}
+
+\ex{Exercise 3.5(a)}
+
+Let $f(t) = t^4+t^3+t^2+t+1$. Note that $f(t)$ is irreducible over $\Q$ if and only if $f(t+1)$ is irreducible over $\Q$. Since
+\begin{align*}
+    f(t+1) &= (t+1)^4+(t+1)^3+(t+1)^2+(t+1)+1 \\
+    &= t^4 + 5t^3 + 10t^2 + 10t + 5,
+\end{align*}
+by Eisenstein's criterion with $q=5$, $f(t+1)$ is irreducible over $\Q$. Therefore, $t^4+t^3+t^2+t+1$ is also irreducible over $\Q$. \epf
+
+\ex{Exercise 3.5(b)}
+
+Let $f(t) = t^5+t^4+t^3+t^2+t+1$. Note that $f(-1) = (-1)^5+(-1)^4+(-1)^3+(-1)^2+(-1)+1 = 0$. By Remainder Theorem, $t+1$ is a factor of $f(t)$, so $f(t) = (t+1)g(t)$ for some $g(t) \in \Q[t]$. Therefore, $t^5+t^4+t^3+t^2+t+1$ is reducible over $\Q$. \epf
+
+\ex{Exercise 3.5(c)}
+
+Let $f(t) = t^6+t^5+t^4+t^3+t^2+t+1$. Note that $f(t)$ is irreducible over $\Q$ if and only if $f(t+1)$ is irreducible over $\Q$. Since
+\begin{align*}
+    f(t+1) &= (t+1)^6 + (t+1)^5 + (t+1)^4 + (t+1)^3 + (t+1)^2 + (t+1) + 1 \\
+    &= t^6+7t^5+21t^4+35t^3+35t^2+21t+7,
+\end{align*}
+by Eisenstein's criterion with $q=7$, $f(t+1)$ is irreducible over $\Q$. Therefore, $t^6+t^5+t^4+t^3+t^2+t+1$ is also irreducible over $\Q$. \epf
+
+\ex{Exercise 3.7}
+
+Suppose $f \neq \zero$ is prime. Assume for contradiction that $f$ is reducible over $K$. Let $f=gh$, where $g,h \in K[t]$ and $\partial g, \partial h < \partial f$. Since $f \mid f$, we have $f \mid gh$, so $f \mid g$ or $f \mid h$. Since $gh = f \neq \zero$, by Exercise 3.12(e), we have $\partial f \leq \partial g$ or $\partial f \leq \partial h$, a contradiction.
+
+Now, suppose $f \neq \zero$ is irreducible. Define
+\begin{align*}
+    I &= \{ g \in K[t] : f \mid g \} \\
+    &= \{ g \in K[t] : g=fq \; \text{for some} \; q \in K[t] \} \\
+    &= \ideal{f}.
+\end{align*}
+By Lemma RF 6.2, $I$ is a maximal ideal of $K[t]$. If $f$ is a constant, then $f$ is prime because a non-zero constant divides any polynomial. Assume $f$ is not constant. Then $f$ does not divide $1$, so $I$ is a proper ideal. Since $K[t]$ is commutative, by Corollary RF 4.13, $K[t]/I$ is a field. Hence, $K[t]/I$ is an integral domain. By Theorem RF 4.16, $I$ is a prime ideal. Therefore, for any $g,h \in K[t]$, $gh \in I$ implies $g \in I$ or $h \in I$, which means that $f \mid gh$ implies $f \mid g$ or $f \mid h$. Hence, $f$ is prime. \epf
+
+\ex{Exercise 3.12(a)} \label{ex3.12a}
+
+The statement is false. A counter-example is $f(t)=t^2$, which is of degree $2$ but has only one distinct zero, namely $t=0$. \epf
+
+\ex{Exercise 3.12(b)}
+
+The statement is true. This is the same as Theorem 3.30, where the subfield is just $\C$ itself. \epf
+
+\ex{Exercise 3.12(c)}
+
+The statement is false. The counter-example from Exercise~\hyperref[ex3.12a]{3.12(a)} also applies here. \epf
+
+\ex{Exercise 3.12(d)}
+
+The statement is false. Any non-zero polynomial $f$ and $g=f$ is a counter-example. Clearly, $f \mid g$ and $\partial f \nleq \partial g$. \epf
+
+\ex{Exercise 3.12(e)}
+
+The statement is true. If $f,g$ are non-zero polynomials and $f \mid g$, then $g=qf$ for some $q \in \C[t]$. If $q=0$, then $g=0f=0$, a contradiction. So $q \neq 0$ and thus $\partial q \geq 0$. Therefore, $\partial g = \partial q + \partial f \geq \partial f$. \epf
+
+\ex{Exercise 3.12(f)}
+
+The statement is true. Assume for contradiction that there exists a reducible polynomial $f$ of degree $1$. Let $f=gh$, where $g,h \in \C[t]$ and $\partial g,\partial h < \partial f = 1$. Hence, $g$ and $h$ are constant (zero or non-zero). Therefore, $gh$ must be a constant, and thus has degree $- \infty$ or $0$. So $\partial f = \partial (gh) \neq 1$, a contradiction. \epf
+
+\ex{Exercise 3.12(g)}
+
+\ex{Exercise 3.12(h)}
+
+The statement is true. This is the statement of Gauss's Lemma. \epf
+
+\ex{Exercise 3.12(i)}
+
+The statement is false. A counter-example is $f(t) = t^2-2$. Assume for contradiction that $f$ is reducible over $\Z$. Then $t^2-2 = (at+b)(ct+d)$ for some $a,b,c,d \in \Z$. We can assume without loss of generality that $a=c=1$, so $t^2-2 = (t+b)(t+d) = t^2+(b+d)t+bd$. By comparing coefficients, we have $b+d=0$ and $bd=-2$. Therefore, $b=-d$ and thus $-d^2=-2$, which implies $d^2=2$. However, no integer $d$ satisfies $d^2=2$. Hence, this is a contradiction. So $f$ is irreducible over $\Z$. Since $t^2-2 = (t+\sqrt{2})(t-\sqrt{2})$, $f$ is reducible over $\R$. \epf
+
+\ex{Exercise 3.12(j)}
+
+The statement is true. The contrapositive of the statement is "if a polynomial $f$ with integer coefficients is reducible over $\Z$, then it is reducible over $\R$``. Let $f$ be a polynomial with integer coefficients that is reducible over $\Z$. Then $f=gh$ for some $g,h \in \Z[t]$ with $\partial g, \partial h < \partial f$. Since $g,h \in \R[t]$, $f$ is reducible over $\R$. \epf
+
+\chap{Chapter 4 Field Extensions}
+
+\ex{Exercise 4.1}
+
+For field extensions $\iota$ and $j$, define $\iota \sim j$ as $\iota$ is isomorphic to $j$. Let $\iota_1 : K_1 \to \hat{K}_1$, $\iota_2 : K_2 \to \hat{K}_2$ and $\iota_3 : K_3 \to \hat{K}_3$ be field extensions.
+
+For the reflexive property, we want to prove that there exists field isomorphisms $\lambda : K_1 \to K_1$ and $\mu : \hat{K}_1 \to \hat{K}_1$, such that \[ \iota_1(\lambda(k)) = \mu(\iota_1(k)) \] for all $k \in K_1$. Consider $\lambda$ and $\mu$ defined by $\lambda(k)=k$ and $\mu(\hat{k})=\hat{k}$ for all $k \in K_1$ and $\hat{k} \in \hat{K}$. Clearly, $\lambda$ and $\mu$ are field isomorphisms. Also, for any $k \in K_1$, we have \[ \iota_1(\lambda(k)) = \iota_1(k) = \mu(\iota_1(k)). \] Therefore, $\iota_1 \sim \iota_1$.
+
+For the symmetric property, assume $\iota_1 \sim \iota_2$, so there exist field isomorphisms $\lambda_1 : K_1 \to K_2$ and $\mu : \hat{K}_1 \to \hat{K}_2$ such that $\iota_2(\lambda_1(k))=\mu_1(\iota_1(k))$ for all $k \in K_1$. We want to prove that $\iota_2 \sim \iota_1$, that is, there exist field isomorphisms $\lambda_2 : K_2 \to K_1$ and $\mu_2 : \hat{K}_2 \to \hat{K}_1$ such that $\iota_1(\lambda_2(k)) = \mu_2(\iota_2(k))$ for all $k \in K_2$. Since $\lambda_1$ and $\mu_1$ are bijective, they have inverses $\lambda_1^{-1}$ and $\mu_1^{-1}$. Let $\lambda_2=\lambda_1^{-1}$ and $\mu_2=\mu_1^{-1}$. Then
+\begin{align*}
+    \iota_1(\lambda_2(k)) &= \iota_1\lt(\lambda_1^{-1}(k)\rt) \\
+    &= \mu_1^{-1}\lt(\mu_1\lt(\iota_1\lt(\lambda_1^{-1}(k)\rt)\rt)\rt) \\
+    &= \mu_2\lt(\iota_2\lt(\lambda_1\lt(\lambda_1^{-1}(k)\rt)\rt)\rt) \\
+    &= \mu_2(\iota_2(k))
+\end{align*}
+for any $k \in K_2$. Therefore, $\iota_2 \sim \iota_1$.
+
+For the transitive property, suppose $\iota_1 \sim \iota_2$ and $\iota_2 \sim \iota_3$, so there exist field isomorphisms $\lambda_1 : K_1 \to K_2$, $\mu_1 : \hat{K}_1 \to \hat{K}_2$, $\lambda_2 : K_2 \to K_3$ and $\mu_2 : \hat{K}_2 \to \hat{K}_3$ such that $\iota_2(\lambda_1(k))=\mu_1(\iota_1(k))$ for all $k \in K_1$ and $\iota_3(\lambda_2(k))=\mu_2(\iota_2(k))$ for all $k \in K_2$. We want to prove that $\iota_1 \sim \iota_3$, that is, there exist field isomorphisms $\lambda_3 : K_1 \to K_3$ and $\mu_3 : \hat{K}_1 \to \hat{K}_3$ such that $\iota_3(\lambda_3(k))=\mu_3(\iota_1(k))$ for all $k \in K_1$. Consider $\lambda_3 = \lambda_2 \circ \lambda_1$ and $\mu_3 = \mu_2 \circ \mu_1$. Note that $\lambda_3$ and $\mu_3$ are field isomorphisms because the composition of field isomorphisms is also a field isomorphism. We have
+\begin{align*}
+    \iota_3(\lambda_3(k)) &= \iota_3(\lambda_2(\lambda_1(k))) \\
+    &= \mu_2(\iota_2(\lambda_1(k))) \\
+    &= \mu_2(\mu_1(\iota_1(k))) \\
+    &= \mu_3(\iota_1(k))
+\end{align*}
+for any $k \in K_1$. Therefore, $\iota_1 \sim \iota_3$.
+
+Hence, the isomorphism of field extensions is an equivalence relation. \epf
+
+\ex{Exercise 4.2(a)}
+
+Since $\{0,1\} \subseteq \Q$ and $\Q$ is the smallest subfield of $\C$, the subfield of $\C$ generated by $\{0,1\}$ is $\Q$. \epf
+
+\ex{Exercise 4.2(b)}
+
+Since $\{0\} \subseteq \Q$ and $\Q$ is the smallest subfield of $\C$, the subfield of $\C$ generated by $\{0\}$ is $\Q$. \epf
+
+\ex{Exercise 4.2(c)}
+
+Let $L$ be the subfield generated by $\{0,1,\imunit\}$. Since $\Q \subseteq L$ and $\imunit \in L$, we have $p+q\imunit \in L$ for any $p,q \in \Q$, so $\{p+q\imunit : p,q \in \Q\} \subseteq L$. Since $\{0,1,\imunit\} \subseteq \{p+q\imunit : p,q \in \Q\}$ and $\{p+q\imunit : p,q \in \Q\}$ is a field, $L \subseteq \{p+q\imunit : p,q \in \Q\}$. Hence, the subfield of $\C$ generated by $\{0,1,\imunit\}$ is $\{p+q\imunit : p,q \in \Q\}$. \epf
+
+\ex{Exercise 4.2(d)}
+
+Let $L$ be the subfield generated by $\{\imunit,\sqrt{2}\}$. Since $\Q \subseteq L$ and $\imunit,\sqrt{2} \in L$, we have $\imunit\sqrt{2} \in L$ and thus $p+q\sqrt{2}+r\imunit+s\imunit\sqrt{2} \in L$ for any $p,q,r,s \in \Q$. Hence, $\{p+q\sqrt{2}+r\imunit+s\imunit\sqrt{2} : p,q,r,s \in \Q\} \subseteq L$. Since $\{\imunit,\sqrt{2}\} \subseteq \{p+q\sqrt{2}+r\imunit+s\imunit\sqrt{2} : p,q,r,s \in \Q\}$ and $\{p+q\sqrt{2}+r\imunit+s\imunit\sqrt{2} : p,q,r,s \in \Q\}$ is a field by Lemma~\ref{prelem:ex4.2d}, $L \subseteq \{p+q\sqrt{2}+r\imunit+s\imunit\sqrt{2} : p,q,r,s \in \Q\}$. Hence, the subfield of $\C$ generated by $\{\imunit,\sqrt{2}\}$ is $\{p+q\sqrt{2}+r\imunit+s\imunit\sqrt{2} : p,q,r,s \in \Q\}$. \epf
+
+\ex{Exercise 4.2(e)}
+
+Let $L$ be the subfield generated by $\{\sqrt{2},\sqrt{3}\}$. Since $\Q \subseteq L$ and $\sqrt{2},\sqrt{3} \in L$, we have $\sqrt{6}=\sqrt{2}\sqrt{3} \in L$ and thus $p+q\sqrt{2}+r\sqrt{3}+s\sqrt{6} \in L$ for any $p,q,r,s \in \Q$. Hence, $\{p+q\sqrt{2}+r\sqrt{3}+s\sqrt{6} : p,q,r,s \in \Q\} \subseteq L$. Since $\{\sqrt{2},\sqrt{3}\} \subseteq \{p+q\sqrt{2}+r\sqrt{3}+s\sqrt{6} : p,q,r,s \in \Q\}$ and $\{p+q\sqrt{2}+r\sqrt{3}+s\sqrt{6} : p,q,r,s \in \Q\}$ is a field by Lemma~\ref{prelem:ex4.2e}, $L \subseteq \{p+q\sqrt{2}+r\sqrt{3}+s\sqrt{6} : p,q,r,s \in \Q\}$. Hence, the subfield of $\C$ generated by $\{\sqrt{2},\sqrt{3}\}$ is $\{p+q\sqrt{2}+r\sqrt{3}+s\sqrt{6} : p,q,r,s \in \Q\}$. \epf
+
+\ex{Exercise 4.2(f)}
+
+Since $\R$ is a field, the subfield of $\C$ generated by $\R$ is $\R$ itself. \epf
+
+\ex{Exercise 4.2(g)}
+
+Let $L$ be the subfield generated by $\R \cup \{\imunit\}$. Since $\R \subseteq L$ and $\imunit \in L$, we have $a+b\imunit \in L$ for any $a,b \in \R$. Hence, $\C = \{a+b\imunit : a,b \in \R\} \subseteq L$. Since $L \subseteq \C$, the subfield of $\C$ generated by $\R \cup \{\imunit\}$ is $\C$. \epf
+
+\ex{Exercise 4.5(a)}
+
+Since $\Q$ is defined as the equivalence classes of $\Z \times (\Z \setminus \{0\})$, we have $|\Q| \leq |\Z \times (\Z \setminus \{0\})| = |\Z| \times |\Z \setminus \{0\}| = \aleph_0 \times \aleph_0 = \aleph_0$. Therefore, $\Q$ is countable. \epf
+
+\ex{Exercise 4.5(b)}
+
+Let $K$ be a countable field and $L/K$ be a simple extension. Then $L=K(\alpha)$ for some $\alpha$. By Lemma~\ref{prelem:ex4.5b}, we have $K(\alpha) = \lt\{ \frac{p(\alpha)}{q(\alpha)} : p(\alpha),q(\alpha) \in K[\alpha], q(\alpha) \neq 0 \rt\}$, so $|K(\alpha)| \leq |K[\alpha]| \times |K[\alpha]|$. Since $K[\alpha] = \{k_0+\ldots+k_n\alpha^n : n \in \N, k_0,\ldots,k_n \in K\}$, we have $|K[\alpha]| = |\N| \times |K| = \aleph_0 \times \aleph_0 = \aleph_0$. Therefore, $|K(\alpha)| \leq \aleph_0 \times \aleph_0 = \aleph_0$. Hence, $K(\alpha)$ is countable. \epf
+
+\ex{Exercise 4.5(c)}
+
+We first prove that $[0,1)$ is uncountable. Assume for contradiction that it is countable. Then we can list all the elements in $[0,1)$ indexed by $\N$. For example,
+\begin{align*}
+    a_1 &= 0.1729384721\ldots \\
+    a_2 &= 0.9983749283\ldots \\
+    a_3 &= 0.1274812733\ldots \\
+    a_4 &= 0.5723948374\ldots \\
+    a_5 &= 0.6812036124\ldots \\
+    \vdots
+\end{align*}
+Denote the $j$-th digit after the decimal point of $a_i$ by $a_{ij}$. We can construct a number $a \in [0,1)$ such that the $i$-th digit of $a$ is
+\[\begin{cases}
+    a_{ii}+1 & \text{if} \, a_{ii} \neq 9 \\
+    0 & \text{if} \, a_{ii} = 9
+\end{cases}.\]
+In this example, we have $a=0.20841\ldots$. For any $i \in \N$, $a$ is different from $a_i$ by at least one digit, namely the $i$-th digit. Hence, $a$ is not on the list, which contradicts that the list contains all elements in $[0,1)$. Therefore, $[0,1)$ is uncountable.
+
+Since $\R \supseteq [0,1)$, we have $|\R| \geq |[0,1)| > \aleph_0$. Hence, $\R$ is uncountable. \epf
+
+\ex{Exercise 4.8}
+
+Assume for contradiction that $t$ has a multiplicative inverse in $\C[t]$. Let $p(t) = a_0+a_1t+a_2t^2+\ldots+a_nt^n \in \C[t]$ be the multiplicative inverse of $t$, where $a_0,a_1,a_2,\ldots,a_n \in \C$. Then we have $tp(t) = 1$, so \[ a_0t+a_1t^2+a_2t^3+\ldots+a_nt^{n+1} = 1. \] The constant term of the expression on the left is $0$, but that on the right is $1$. Hence, this is a contradiction. So $t$ has no multiplicative inverse in $\C[t]$. \epf
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
